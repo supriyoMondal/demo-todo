@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS" /* Specify what module code is generated. */,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "outDir": "dist",
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+  },
+  "exclude": ["node_modules", "dist", "mobileapp"]
+}
