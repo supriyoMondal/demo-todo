@@ -6,13 +6,21 @@ import {
   timestamp,
   boolean,
   index,
+  json,
 } from "drizzle-orm/pg-core";
-import { InferSelectModel } from "drizzle-orm";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
 export const replicacheMeta = pgTable("replicache_meta", {
-  id: serial("id").primaryKey(),
-  key: varchar("key").notNull(),
-  value: varchar("value").notNull(),
+  key: varchar("key").notNull().primaryKey(),
+  value: json("value").notNull(),
+});
+
+export const replicacheClient = pgTable("replicache_client", {
+  id: varchar("id").primaryKey().notNull(),
+  lastMutationId: integer("last_mutation_id").notNull(),
+  lastMutationTimestamp: timestamp("last_mutation_timestamp").notNull(),
+  version: integer("version").notNull(),
+  clientGroupId: varchar("client_group_id").notNull(),
 });
 
 export const userSpace = pgTable("user_space", {
@@ -24,7 +32,7 @@ export const userSpace = pgTable("user_space", {
 export const todo = pgTable(
   "todo",
   {
-    id: serial("id").primaryKey(),
+    id: varchar("id").primaryKey(),
     userSpaceId: varchar("user_space_id")
       .references(() => userSpace.id, {
         onDelete: "cascade",
@@ -35,12 +43,16 @@ export const todo = pgTable(
     createdAt: timestamp("created_at").notNull().$type<string>(),
     lastModified: timestamp("last_modified").notNull().$type<string>(),
     favorite: boolean("favorite").default(false),
-    sort: integer("sort").notNull(),
     completed: boolean("completed").default(false),
+    version: integer("version").notNull(),
+    key: varchar("key").notNull(),
+    deleted: boolean("deleted").default(false).notNull(),
   },
   (table) => ({
     userSpaceIndex: index("todo_user_space_index").on(table.userSpaceId),
+    versionIndex: index("todo_version_index").on(table.version),
   })
 );
 
 export type TodoItem = InferSelectModel<typeof todo>;
+export type TodoItemIn = InferInsertModel<typeof todo>;

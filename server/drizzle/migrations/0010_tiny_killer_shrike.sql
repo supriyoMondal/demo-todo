@@ -1,0 +1,1 @@
+ALTER TABLE "todo" ADD COLUMN "deleted" boolean DEFAULT false NOT NULL;

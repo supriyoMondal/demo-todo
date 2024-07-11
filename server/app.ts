@@ -1,11 +1,12 @@
 import express from "express";
 import { ENV } from "./src/config/envs";
-import { testConnection } from "./src/test";
-import { mutators } from "shared";
-
-console.log(mutators);
+import routes from "./src/routes";
 
 const app = express();
+
+app.use(express.urlencoded({ extended: true }), express.json());
+
+app.use("/api", routes);
 
 app.get("/", (req, res) => {
   res.send("Hello Todo App!");

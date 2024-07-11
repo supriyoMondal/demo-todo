@@ -8,6 +8,76 @@
       "when": 1720551812063,
       "tag": "0000_chilly_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1720721501036,
+      "tag": "0001_parallel_malice",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1720722012712,
+      "tag": "0002_silly_hiroim",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1720723060163,
+      "tag": "0003_bent_darwin",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1720724281405,
+      "tag": "0004_clean_boomerang",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1720724315475,
+      "tag": "0005_sturdy_hemingway",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1720725852373,
+      "tag": "0006_low_swordsman",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1720725869130,
+      "tag": "0007_luxuriant_dakota_north",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1720728299067,
+      "tag": "0008_certain_quasar",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1720728336682,
+      "tag": "0009_gigantic_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1720729299458,
+      "tag": "0010_tiny_killer_shrike",
+      "breakpoints": true
     }
   ]
 }

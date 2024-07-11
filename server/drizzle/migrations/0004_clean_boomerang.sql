@@ -1,0 +1,1 @@
+DROP TABLE "replicache_meta";
