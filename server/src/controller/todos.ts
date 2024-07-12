@@ -4,12 +4,12 @@ import { z } from "zod";
 import { handleError } from "../utils/handleError";
 import { db } from "../db";
 import { replicacheClient, todo, userSpace } from "../db/schema";
-import { ReplicacheTransaction } from "replicache-transaction";
 import { and, eq, gt } from "drizzle-orm";
 import type { ClientID, PatchOperation } from "replicache";
 import { getCookie, setCookie, setLastMutationIDs } from "../utils/dbHelpers";
 import { PostgresStorage } from "../utils/postgresStorage";
 import { getPokeBackend } from "../utils/poke";
+import { loadReplicacheTransaction } from "../utils/repliCacheTransction";
 
 const spaceIdQuerySchema = z.object({
   spaceID: z.string(),
@@ -64,7 +64,7 @@ export const pushTodoController = async (req: Request, res: Response) => {
       );
 
       const storage = new PostgresStorage(spaceID, nextVersion, tx);
-      const rpTransaction = new ReplicacheTransaction(storage);
+      const rpTransaction = await loadReplicacheTransaction(storage);
 
       for (let i = 0; i < push.mutations.length; i++) {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
@@ -140,7 +140,6 @@ export const pullTodoController = async (req: Request, res: Response) => {
     const pull = pullRequest.parse(req.body);
     const { cookie: requestCookie } = pull;
 
-    const t0 = Date.now();
     const sinceCookie = requestCookie ?? 0;
 
     const promises = [

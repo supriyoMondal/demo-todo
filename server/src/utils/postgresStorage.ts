@@ -29,6 +29,8 @@ export class PostgresStorage implements Storage {
   }
 
   async putEntry(key: string, value: ReadonlyJSONValue): Promise<void> {
+    console.log(key, value);
+
     throw new Error("Method not implemented.");
   }
 
