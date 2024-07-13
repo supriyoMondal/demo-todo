@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db, pgClient } from "../db";
-import { replicacheClient, userSpace } from "../db/schema";
+import { userSpace } from "../db/schema";
 
 export const getCookie = async (spaceID: string) => {
   const [userSpaceVersion] = await db

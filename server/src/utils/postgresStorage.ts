@@ -2,10 +2,9 @@ import { and, eq, gt, type ExtractTablesWithRelations } from "drizzle-orm";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { ReadonlyJSONValue } from "replicache";
-import type { Storage } from "replicache-transaction";
 import { todo } from "../db/schema";
 
-export class PostgresStorage implements Storage {
+export class PostgresStorage {
   private _spaceID: string;
   private _version: number;
   private _pgClient: PgTransaction<

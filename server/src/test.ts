@@ -1,4 +1,5 @@
 import { pgClient } from "./db";
+import { PostgresStorage } from "./utils/postgresStorage";
 
 export const testConnection = async () => {
   try {

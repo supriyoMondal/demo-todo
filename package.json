@@ -1,0 +1,14 @@
+{
+  "name": "todoapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/supriyoMondal/demo-todo.git",
+  "author": "supriyo <supriyo.monndal@firewires.in>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "mobileapp",
+    "server",
+    "shared"
+  ]
+}

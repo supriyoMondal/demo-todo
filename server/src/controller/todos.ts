@@ -3,13 +3,13 @@ import { mutators } from "shared-mutations";
 import { z } from "zod";
 import { handleError } from "../utils/handleError";
 import { db } from "../db";
-import { replicacheClient, todo, userSpace } from "../db/schema";
+import { replicacheClient, todo } from "../db/schema";
 import { and, eq, gt } from "drizzle-orm";
 import type { ClientID, PatchOperation } from "replicache";
 import { getCookie, setCookie, setLastMutationIDs } from "../utils/dbHelpers";
 import { PostgresStorage } from "../utils/postgresStorage";
 import { getPokeBackend } from "../utils/poke";
-import { loadReplicacheTransaction } from "../utils/repliCacheTransction";
+import { ReplicacheTransaction } from "replicache-transaction";
 
 const spaceIdQuerySchema = z.object({
   spaceID: z.string(),
@@ -64,7 +64,8 @@ export const pushTodoController = async (req: Request, res: Response) => {
       );
 
       const storage = new PostgresStorage(spaceID, nextVersion, tx);
-      const rpTransaction = await loadReplicacheTransaction(storage);
+
+      const rpTransaction = new ReplicacheTransaction(storage);
 
       for (let i = 0; i < push.mutations.length; i++) {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
