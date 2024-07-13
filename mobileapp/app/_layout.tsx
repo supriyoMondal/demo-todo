@@ -10,6 +10,8 @@ import { NAV_THEME } from "~/lib/constants";
 import { useColorScheme } from "~/lib/useColorScheme";
 import { PortalHost } from "@rn-primitives/portal";
 import { ThemeToggle } from "~/components/ThemeToggle";
+import ChangeWorkSpace from "~/components/layout/ChangeWorkSpace";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const LIGHT_THEME: Theme = {
   dark: false,
@@ -62,18 +64,26 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{
-            title: "Todos",
-            headerRight: () => <ThemeToggle />,
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+        <Stack
+          screenOptions={{
+            headerShadowVisible: false,
+            headerTitleAlign: "center",
           }}
-        />
-      </Stack>
-      <PortalHost />
-    </ThemeProvider>
+        >
+          <Stack.Screen
+            name="index"
+            options={{
+              title: "Todos",
+              headerRight: () => <ThemeToggle />,
+              headerLeft: () => <ChangeWorkSpace />,
+            }}
+          />
+        </Stack>
+        <PortalHost />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

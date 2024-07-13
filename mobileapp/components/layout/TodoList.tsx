@@ -1,16 +1,10 @@
-import {
-  Button,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useSubscribe } from "replicache-react";
 import { listTodos } from "shared-mutations";
 import { useReplicache } from "~/hooks/useRiplecache";
 import { bootCryptoPolyfill } from "~/crypto-polyfill";
+import { Button } from "../ui/button";
 
 bootCryptoPolyfill();
 
@@ -79,9 +73,7 @@ const TodoList = () => {
           </View>
         </View>
       ))}
-
       <Button
-        title="Add Todo"
         onPress={() => {
           const id = generateRandomString(8);
           rep.mutate.createTodo({
@@ -90,7 +82,9 @@ const TodoList = () => {
             id,
           });
         }}
-      />
+      >
+        <Text>Add Todo</Text>
+      </Button>
     </ScrollView>
   );
 };

@@ -9,6 +9,7 @@ import React, { useCallback, useImperativeHandle, useRef } from "react";
 import Animated, {
   Extrapolate,
   interpolate,
+  runOnJS,
   useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
@@ -27,6 +28,7 @@ const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50;
 
 type BottomSheetProps = {
   children?: React.ReactNode;
+  onClose?: () => void;
 };
 
 export type BottomSheetRefProps = {
@@ -35,7 +37,7 @@ export type BottomSheetRefProps = {
 };
 
 const BottomSheet = React.forwardRef<BottomSheetRefProps, BottomSheetProps>(
-  ({ children }, ref) => {
+  ({ children, onClose }, ref) => {
     const translateY = useRef(useSharedValue(0));
     const animatedValue = useRef(useSharedValue(0));
     const disabled = useRef(useSharedValue(true));
@@ -47,11 +49,16 @@ const BottomSheet = React.forwardRef<BottomSheetRefProps, BottomSheetProps>(
     const scrollTo = useCallback((destination: number) => {
       "worklet";
       active.value = destination !== 0;
+
       animatedValue.current.value = 10;
       translateY.current.value = withTiming(destination, {
         duration: 300,
       });
       disabled.current.value = true;
+
+      if (onClose && destination === 0) {
+        runOnJS(onClose)();
+      }
     }, []);
 
     const isActive = useCallback(() => {
