@@ -16,9 +16,10 @@ export const mutators = {
 
   createTodo: async (tx: WriteTransaction, todo: Omit<TodoItem, "sort">) => {
     const todos = await listTodos<TodoItem>(tx);
-    todos.sort((t1, t2) => t1.sort - t2.sort);
 
-    const maxSort = todos.pop()?.sort ?? 0;
+    const maxSort =
+      todos.length > 0 ? Math.max(...todos.map((t) => t.sort)) : 0;
+
     await tx.set(`todo/${todo.id}`, { ...todo, sort: maxSort + 1 });
   },
 };

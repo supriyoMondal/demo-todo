@@ -30,7 +30,7 @@ const pushRequestSchema = z.object({
 
 export const pushTodoController = async (req: Request, res: Response) => {
   try {
-    console.log("Processing push", JSON.stringify(req.body, null, ""));
+    console.log("Processing push");
     const { spaceID } = spaceIdQuerySchema.parse(req.query);
     const push = pushRequestSchema.parse(req.body);
 
@@ -51,7 +51,7 @@ export const pushTodoController = async (req: Request, res: Response) => {
             .from(replicacheClient)
             .where(eq(replicacheClient.id, clientID));
 
-          return [clientID, lastMutationID ?? 0];
+          return [clientID, lastMutationID?.lastMutationId ?? 0];
         }) as Promise<[ClientID, number]>[]
       );
 
@@ -70,10 +70,11 @@ export const pushTodoController = async (req: Request, res: Response) => {
       for (let i = 0; i < push.mutations.length; i++) {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         const mutation = push.mutations[i]!;
+
         const { clientID } = mutation;
         const lastMutationID = lastMutationIDs[clientID];
 
-        if (!lastMutationID) {
+        if (lastMutationID === undefined) {
           throw new Error("Last mutation ID not found");
         }
 
@@ -103,7 +104,6 @@ export const pushTodoController = async (req: Request, res: Response) => {
         }
 
         lastMutationIDs[clientID] = expectedMutationID;
-        console.log("Mutation processed");
       }
       await Promise.all([
         setLastMutationIDs(clientGroupID, lastMutationIDs, nextVersion),
@@ -112,6 +112,7 @@ export const pushTodoController = async (req: Request, res: Response) => {
       ]);
 
       const pokeBackend = getPokeBackend();
+
       pokeBackend.poke(spaceID);
     });
     console.log(" all mutations processed");
@@ -135,8 +136,6 @@ export type PullResponse = {
 
 export const pullTodoController = async (req: Request, res: Response) => {
   try {
-    console.log("Processing pull", JSON.stringify(req.body, null, ""));
-
     const { spaceID } = spaceIdQuerySchema.parse(req.query);
     const pull = pullRequest.parse(req.body);
     const { cookie: requestCookie } = pull;
@@ -148,8 +147,13 @@ export const pullTodoController = async (req: Request, res: Response) => {
         .select()
         .from(todo)
         .where(
-          and(eq(todo.userSpaceId, spaceID), gt(todo.version, sinceCookie))
-        ),
+          and(
+            eq(todo.userSpaceId, spaceID),
+            gt(todo.version, sinceCookie),
+            eq(todo.deleted, false)
+          )
+        )
+        .orderBy(todo.lastModified),
       db
         .select()
         .from(replicacheClient)
@@ -188,11 +192,14 @@ export const pullTodoController = async (req: Request, res: Response) => {
       });
     });
 
-    return resp;
+    return res.send(resp);
   } catch (error) {
     handleError(error, res);
   }
 };
+
+let pokeInterval: ReturnType<typeof setInterval>;
+let unlisten: () => void;
 
 export const pokeTodoController = async (req: Request, res: Response) => {
   try {
@@ -209,14 +216,22 @@ export const pokeTodoController = async (req: Request, res: Response) => {
 
     const pokeBackend = getPokeBackend();
 
-    const unlisten = pokeBackend.addListener(spaceID as string, () => {
+    if (unlisten) {
+      unlisten();
+    }
+
+    unlisten = pokeBackend.addListener(spaceID as string, () => {
       console.log(`Sending poke for space ${spaceID}`);
       res.write(`id: ${Date.now()}\n`);
       // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
       res.write(`data: poke\n\n`);
     });
 
-    setInterval(() => {
+    if (pokeInterval) {
+      clearInterval(pokeInterval);
+    }
+
+    pokeInterval = setInterval(() => {
       res.write(`id: ${Date.now()}\n`);
       // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
       res.write(`data: beat\n\n`);

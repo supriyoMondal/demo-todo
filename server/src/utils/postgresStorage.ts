@@ -2,7 +2,8 @@ import { and, eq, gt, type ExtractTablesWithRelations } from "drizzle-orm";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { ReadonlyJSONValue } from "replicache";
-import { todo } from "../db/schema";
+import { todo, TodoItemIn } from "../db/schema";
+import { z } from "zod";
 
 export class PostgresStorage {
   private _spaceID: string;
@@ -28,9 +29,60 @@ export class PostgresStorage {
   }
 
   async putEntry(key: string, value: ReadonlyJSONValue): Promise<void> {
-    console.log(key, value);
+    const todoSchema = z.object({
+      title: z.string(),
+      description: z.string().optional().default(""),
+      favorite: z.boolean().optional().default(false),
+      completed: z.boolean().optional().default(false),
+      deleted: z.boolean().optional().default(false),
+      sort: z.number().optional().default(0),
+    });
 
-    throw new Error("Method not implemented.");
+    console.log({ putKey: key, putValue: value });
+
+    const { title, description, favorite, completed, deleted, sort } =
+      todoSchema.parse(value);
+
+    const isTodoAlreadyPresent = await this.hasEntry(key);
+
+    if (isTodoAlreadyPresent) {
+      await this._pgClient
+        .update(todo)
+        .set({
+          title,
+          description,
+          favorite,
+          completed,
+          deleted,
+          sort,
+          //  @ts-ignore
+          lastModified: new Date(),
+          version: this._version,
+        })
+        .where(eq(todo.key, key));
+
+      return;
+    }
+
+    const todoEntry: TodoItemIn = {
+      id: key,
+      title,
+      description,
+      // @ts-ignore
+      createdAt: new Date(),
+      //  @ts-ignore
+      lastModified: new Date(),
+      favorite,
+      completed,
+      key,
+      deleted,
+      userSpaceId: this._spaceID,
+      version: this._version,
+      sort,
+    };
+
+    await this._pgClient.insert(todo).values(todoEntry);
+    console.log("todo created", todoEntry);
   }
 
   async hasEntry(key: string): Promise<boolean> {
@@ -43,6 +95,7 @@ export class PostgresStorage {
       .select()
       .from(todo)
       .where(and(eq(todo.key, key), eq(todo.userSpaceId, this._spaceID)));
+
     return todoItem;
   }
 

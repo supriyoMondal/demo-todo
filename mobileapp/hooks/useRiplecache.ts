@@ -1,10 +1,13 @@
 import { createReplicacheExpoSQLiteExperimentalCreateKVStore } from "@react-native-replicache/react-native-expo-sqlite";
 import React from "react";
+import { Platform } from "react-native";
 import EventSource from "react-native-sse";
 import { Replicache } from "replicache";
 import { mutators } from "shared-mutations";
 
-const BASE_URL = "http://10.0.2.2:3000/api";
+const BASE_URL = `http://${
+  Platform.OS === "ios" ? "localhost" : "10.0.2.2"
+}:3000/api`;
 
 export function useReplicache(listID: string) {
   const licenseKey = "la286d8bfcb014da1aa403846d791e32e";
@@ -18,7 +21,6 @@ export function useReplicache(listID: string) {
         licenseKey,
         pushURL: `${BASE_URL}/todo/push?spaceID=${listID}`,
         pullURL: `${BASE_URL}/todo/pull?spaceID=${listID}`,
-
         experimentalCreateKVStore:
           createReplicacheExpoSQLiteExperimentalCreateKVStore,
         name: listID,

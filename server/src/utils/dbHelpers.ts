@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db, pgClient } from "../db";
-import { userSpace } from "../db/schema";
+import { replicacheClient, userSpace } from "../db/schema";
 
 export const getCookie = async (spaceID: string) => {
   const [userSpaceVersion] = await db
@@ -24,17 +24,23 @@ export const setLastMutationID = async (
   lastMutationID: number,
   version: number
 ) => {
-  await pgClient.query(
-    `
-    INSERT INTO replicache_client (id, last_mutation_id, last_mutation_timestamp, version, client_group_id)
-    VALUES ($1, $2, $3, $4, $5)
-    ON CONFLICT (id) DO UPDATE SET
-      last_mutation_id = $2,
-      last_mutation_timestamp = $3,
-      version = $4
-    WHERE replicache_client.client_group_id = $5`,
-    [clientID, lastMutationID, new Date(), version, clientGroupID]
-  );
+  await db
+    .insert(replicacheClient)
+    .values({
+      id: clientID,
+      version,
+      clientGroupId: clientGroupID,
+      lastMutationId: lastMutationID,
+      lastMutationTimestamp: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: replicacheClient.id,
+      set: {
+        lastMutationId: lastMutationID,
+        lastMutationTimestamp: new Date(),
+        version,
+      },
+    });
 };
 
 export const setLastMutationIDs = async (
