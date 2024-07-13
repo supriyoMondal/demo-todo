@@ -7,9 +7,12 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { useReplicache } from "@/hooks/useRiplecache";
 import { useSubscribe } from "replicache-react";
 import { listTodos } from "shared-mutations";
+import { useReplicache } from "~/hooks/useRiplecache";
+import { bootCryptoPolyfill } from "~/crypto-polyfill";
+
+bootCryptoPolyfill();
 
 export function generateRandomString(length = 10) {
   const characters =
