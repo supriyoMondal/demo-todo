@@ -48,6 +48,7 @@ export const todo = pgTable(
     key: varchar("key").notNull(),
     deleted: boolean("deleted").default(false).notNull(),
     sort: integer("sort").default(0).notNull(),
+    workSpace: varchar("work_space"),
   },
   (table) => ({
     userSpaceIndex: index("todo_user_space_index").on(table.userSpaceId),

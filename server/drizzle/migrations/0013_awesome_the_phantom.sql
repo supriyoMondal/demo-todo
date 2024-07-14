@@ -1,0 +1,1 @@
+ALTER TABLE "todo" ADD COLUMN "work_space" varchar;
