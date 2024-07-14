@@ -13,6 +13,9 @@ import { useSubscribe } from "replicache-react";
 import { useReplicache } from "~/hooks/useRiplecache";
 import { listTodos, TodoItem } from "shared-mutations";
 import TodoItemList from "~/components/Home/TodoItemList";
+import { generateRandomString } from "~/components/layout/TodoList";
+import useCurrentUserSpace from "~/hooks/state/useCurrentUserSpace";
+import useHomeTabIndex from "~/hooks/state/useHomeTabIndex";
 
 const { width } = Dimensions.get("window");
 
@@ -20,13 +23,42 @@ export default function Screen() {
   const scrollViewRef = React.useRef<Animated.FlatList<{}>>(null);
   const tabScrollViewRef = React.useRef<ScrollView>(null);
 
-  const [currentUserSpaceId] = useStorage("userSpaceId");
+  const currentUserSpaceId = useCurrentUserSpace((store) => store.spaceId);
 
   const { data: workspaces } = useWorkSpaceList(currentUserSpaceId);
+  const tabIndex = useHomeTabIndex((store) => store.homeTabIndex);
 
   const rep = useReplicache();
+
   // @ts-expect-error complex ts error
   const todos = useSubscribe(rep, listTodos, [], [rep]);
+
+  const updateTodo = React.useCallback(
+    (todo: TodoItem) => {
+      rep.mutate.updateTodo({
+        ...todo,
+        key: todo.id?.replace("todo/", ""),
+        id: todo.key?.replace("todo/", ""),
+      });
+    },
+    [rep]
+  );
+
+  const createTodo = React.useCallback(
+    (todo: { title: string; description: string }) => {
+      const todoBody = {
+        title: todo.title,
+        description: todo.description,
+        id: generateRandomString(8),
+        userSpaceId: currentUserSpaceId,
+        workSpace: workspaces[tabIndex].name,
+        favorite: tabIndex === 0,
+      } as any;
+
+      rep.mutate.createTodo(todoBody);
+    },
+    [rep, currentUserSpaceId, workspaces, tabIndex]
+  );
 
   const workSpaceTodos = React.useMemo(() => {
     const map = workspaces.reduce(
@@ -71,7 +103,9 @@ export default function Screen() {
         name: string;
         id: number;
       };
-    }) => <TodoItemList todos={workSpaceTodos[item.name]} />,
+    }) => (
+      <TodoItemList todos={workSpaceTodos[item.name]} updateTodo={updateTodo} />
+    ),
     [workSpaceTodos]
   );
 
@@ -100,7 +134,7 @@ export default function Screen() {
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
       />
-      <HomeFooter />
+      <HomeFooter createTodo={createTodo} />
     </View>
   );
 }

@@ -42,6 +42,7 @@ export function useReplicache() {
     });
 
     return () => {
+      ev.removeAllEventListeners("message");
       ev.close();
     };
   }, [listID]);

@@ -5,7 +5,12 @@ import {
   View,
   ViewProps,
 } from "react-native";
-import React, { useCallback, useImperativeHandle, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import Animated, {
   Extrapolate,
   interpolate,

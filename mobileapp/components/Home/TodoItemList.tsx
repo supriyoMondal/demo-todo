@@ -26,7 +26,13 @@ import { useReplicache } from "~/hooks/useRiplecache";
 
 const { width } = Dimensions.get("window");
 
-const TodoItemList = ({ todos }: { todos: TodoItem[] }) => {
+const TodoItemList = ({
+  todos,
+  updateTodo,
+}: {
+  todos: TodoItem[];
+  updateTodo: (todo: TodoItem) => void;
+}) => {
   const { completed, notCompleted } = useMemo(() => {
     const completed: TodoItem[] = [];
     const notCompleted: TodoItem[] = [];
@@ -48,7 +54,9 @@ const TodoItemList = ({ todos }: { todos: TodoItem[] }) => {
     <FlatList
       data={notCompleted}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <TodoListItem todo={item} />}
+      renderItem={({ item }) => (
+        <TodoListItem onUpdateTodo={updateTodo} todo={item} />
+      )}
       style={{ flex: 1, width }}
       ListEmptyComponent={
         <View className="flex-1 items-center justify-center h-[70vh]">
@@ -100,17 +108,19 @@ const CompletedTodos = ({ completedTodos }: { completedTodos: TodoItem[] }) => {
   );
 };
 
-const TodoListItem = ({ todo }: { todo: TodoItem }) => {
-  const rep = useReplicache();
-
+const TodoListItem = ({
+  todo,
+  onUpdateTodo,
+}: {
+  todo: TodoItem;
+  onUpdateTodo: (todo: TodoItem) => void;
+}) => {
   return (
     <View key={todo.id} className="p-3 px-1 flex-row items-start  gap-3">
       <TouchableOpacity
         onPress={() => {
-          rep.mutate.updateTodo({
+          onUpdateTodo({
             ...todo,
-            key: todo.id?.replace("todo/", ""),
-            id: todo.key?.replace("todo/", ""),
             completed: true,
           });
         }}
@@ -123,10 +133,8 @@ const TodoListItem = ({ todo }: { todo: TodoItem }) => {
       </View>
       <TouchableOpacity
         onPress={() => {
-          rep.mutate.updateTodo({
+          onUpdateTodo({
             ...todo,
-            key: todo.id?.replace("todo/", ""),
-            id: todo.key?.replace("todo/", ""),
             favorite: !todo.favorite,
           });
         }}
