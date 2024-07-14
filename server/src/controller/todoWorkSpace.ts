@@ -59,7 +59,10 @@ export const listTodoWorkSpace = async (req: Request, res: Response) => {
     res.send([
       { name: "Fav", id: -1 },
       { name: "My Todos", id: -2 },
-      ...workspaces,
+      ...workspaces.map((workspace) => ({
+        name: workspace.name,
+        id: String(workspace.id),
+      })),
     ]);
   } catch (error) {
     handleError(error, res);

@@ -8339,7 +8339,7 @@ shallowequal@^1.1.0:
   integrity sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==
 
 "shared-mutations@file:shared":
-  version "1.0.2"
+  version "1.0.6"
   dependencies:
     replicache "^14.2.2"
 
