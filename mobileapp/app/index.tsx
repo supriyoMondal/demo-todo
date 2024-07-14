@@ -43,7 +43,8 @@ export default function Screen() {
     for (const todo of todos) {
       if (todo.favorite) {
         map.Fab.push(todo);
-      } else if (!todo.workSpace) {
+      }
+      if (!todo.workSpace) {
         map["My Todos"].push(todo);
       } else {
         map[todo.workSpace].push(todo);
@@ -90,6 +91,7 @@ export default function Screen() {
         data={workspaces}
         horizontal
         ref={scrollViewRef}
+        style={{ flex: 1 }}
         showsHorizontalScrollIndicator={false}
         pagingEnabled
         bounces={false}
