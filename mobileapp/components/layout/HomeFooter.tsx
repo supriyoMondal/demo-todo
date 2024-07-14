@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Keyboard, TouchableOpacity, View } from "react-native";
 import { Plus } from "~/lib/icons/Plus";
 import { TableProperties } from "~/lib/icons/List";
 import { HorizontalThreeDot } from "~/lib/icons/HorizontalThreeDot";
@@ -9,15 +9,29 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 const HomeFooter = () => {
   const sheetRef = React.useRef<React.ElementRef<typeof BottomSheet>>(null);
+  const [keypadVisible, setKeypadVisible] = React.useState(false);
 
   const [bottomSheetType, setBottomSheetType] = React.useState<
     "Add" | "Edit" | "List"
   >();
 
+  React.useEffect(() => {
+    Keyboard.addListener("keyboardDidShow", () => {
+      setKeypadVisible(true);
+    });
+    Keyboard.addListener("keyboardDidHide", () => {
+      setKeypadVisible(false);
+    });
+    return () => {
+      Keyboard.removeAllListeners("keyboardDidShow");
+      Keyboard.removeAllListeners("keyboardDidHide");
+    };
+  }, []);
+
   return (
     <>
-      {!bottomSheetType ? (
-        <Animated.View entering={FadeInDown.delay(50)} exiting={FadeInDown}>
+      {!bottomSheetType && !keypadVisible ? (
+        <Animated.View entering={FadeInDown.delay(100)} exiting={FadeInDown}>
           <View className="bg-card h-24 px-4 items-center flex-row gap-8">
             <TouchableOpacity
               onPress={() => {

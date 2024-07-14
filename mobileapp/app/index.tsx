@@ -9,25 +9,49 @@ import clsx from "clsx";
 import { Separator } from "~/components/ui/saperator";
 import HomeFooter from "~/components/layout/HomeFooter";
 import AnimatedTabBar from "~/components/Home/AnimatedtabBar";
+import { useStorage } from "~/hooks/useStorage";
+import useWorkSpaceList from "~/hooks/state/useWorkSpaceList";
+import { useSubscribe } from "replicache-react";
+import { useReplicache } from "~/hooks/useRiplecache";
+import { listTodos, TodoItem } from "shared-mutations";
+import useCurrentUserSpace from "~/hooks/state/useCurrentUserSpace";
+import TodoItemList from "~/components/Home/TodoItemList";
 
 const { width } = Dimensions.get("window");
-
-const data = [
-  { title: "Supriyo", description: "This is a todo", color: " bg-red-500" },
-  { title: "Amit", description: "This is a todo", color: " bg-green-500" },
-  { title: "Dinesh", description: "This is a todo", color: " bg-blue-500" },
-  { title: "Rahul", description: "This is a todo", color: " bg-yellow-500" },
-  { title: "Nitin", description: "This is a todo", color: " bg-purple-500" },
-  { title: "Prateek", description: "This is a todo", color: " bg-pink-500" },
-  { title: "Ankit", description: "This is a todo", color: " bg-orange-500" },
-  { title: "Harsh", description: "This is a todo", color: " bg-gray-500" },
-  { title: "Vikas", description: "This is a todo", color: " bg-cyan-500" },
-  { title: "Shubham", description: "This is a todo", color: " bg-sky-500" },
-];
 
 export default function Screen() {
   const scrollViewRef = React.useRef<Animated.FlatList<{}>>(null);
   const tabScrollViewRef = React.useRef<ScrollView>(null);
+
+  const [currentUserSpaceId] = useStorage("userSpaceId");
+
+  const { data: workspaces } = useWorkSpaceList(currentUserSpaceId);
+  const spaceId = useCurrentUserSpace((store) => store.spaceId);
+  const rep = useReplicache(spaceId);
+  // @ts-expect-error complex ts error
+  const todos = useSubscribe(rep, listTodos, [], [rep]);
+
+  const workSpaceTodos = React.useMemo(() => {
+    const map = workspaces.reduce(
+      (acc, workspace) => {
+        acc[workspace.name] = [];
+        return acc;
+      },
+      { "My Todos": [] } as Record<string, TodoItem[]>
+    );
+
+    for (const todo of todos) {
+      if (todo.favorite) {
+        map.Fab.push(todo);
+      } else if (!todo.workSpace) {
+        map["My Todos"].push(todo);
+      } else {
+        map[todo.workSpace].push(todo);
+      }
+    }
+
+    return map;
+  }, [todos, workspaces]);
 
   const scrollX = useSharedValue(0);
 
@@ -41,17 +65,29 @@ export default function Screen() {
     scrollViewRef.current?.scrollToIndex({ index, animated: true });
   }, []);
 
+  const renderItem = React.useCallback(
+    ({
+      item,
+    }: {
+      item: {
+        name: string;
+        id: number;
+      };
+    }) => <TodoItemList todos={workSpaceTodos[item.name]} />,
+    [workSpaceTodos]
+  );
+
   return (
     <View className="flex-1 bg-secondary/30">
       <AnimatedTabBar
-        items={data.map((item) => item.title)}
+        items={workspaces.map((item) => item.name)}
         scrollX={scrollX}
         onTabPress={onTabPress}
         tabScrollViewRef={tabScrollViewRef}
       />
       <Separator />
       <Animated.FlatList
-        data={data}
+        data={workspaces}
         horizontal
         ref={scrollViewRef}
         showsHorizontalScrollIndicator={false}
@@ -61,20 +97,9 @@ export default function Screen() {
         snapToInterval={width}
         decelerationRate="fast"
         onScroll={scrollHandler}
-        renderItem={({ item }) => {
-          return (
-            <View
-              style={{ width }}
-              className={clsx(
-                "flex-1 items-center justify-center  bg-secondary/30"
-              )}
-            >
-              <Text className="text-2xl text-center">{item.title}</Text>
-              <Text className="text-sm text-center">{item.description}</Text>
-            </View>
-          );
-        }}
-        keyExtractor={(item) => item.title}
+        extraData={workSpaceTodos}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
       />
       <HomeFooter />
     </View>

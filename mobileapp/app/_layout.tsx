@@ -10,8 +10,13 @@ import { NAV_THEME } from "~/lib/constants";
 import { useColorScheme } from "~/lib/useColorScheme";
 import { PortalHost } from "@rn-primitives/portal";
 import { ThemeToggle } from "~/components/ThemeToggle";
-import ChangeWorkSpace from "~/components/layout/ChangeWorkSpace";
+import ChangeWorkSpace from "~/components/layout/ChangUserSpace";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "~/config/queryClient";
+import { bootCryptoPolyfill } from "~/crypto-polyfill";
+
+bootCryptoPolyfill();
 
 const LIGHT_THEME: Theme = {
   dark: false,
@@ -65,25 +70,27 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-        <Stack
-          screenOptions={{
-            headerShadowVisible: false,
-            headerTitleAlign: "center",
-          }}
-        >
-          <Stack.Screen
-            name="index"
-            options={{
-              title: "Todos",
-              headerRight: () => <ThemeToggle />,
-              headerLeft: () => <ChangeWorkSpace />,
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+          <Stack
+            screenOptions={{
+              headerShadowVisible: false,
+              headerTitleAlign: "center",
             }}
-          />
-        </Stack>
-        <PortalHost />
-      </ThemeProvider>
+          >
+            <Stack.Screen
+              name="index"
+              options={{
+                title: "Todos",
+                headerRight: () => <ThemeToggle />,
+                headerLeft: () => <ChangeWorkSpace />,
+              }}
+            />
+          </Stack>
+          <PortalHost />
+        </ThemeProvider>
+      </QueryClientProvider>
     </GestureHandlerRootView>
   );
 }

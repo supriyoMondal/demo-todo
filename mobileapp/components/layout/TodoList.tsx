@@ -3,10 +3,7 @@ import React from "react";
 import { useSubscribe } from "replicache-react";
 import { listTodos } from "shared-mutations";
 import { useReplicache } from "~/hooks/useRiplecache";
-import { bootCryptoPolyfill } from "~/crypto-polyfill";
 import { Button } from "../ui/button";
-
-bootCryptoPolyfill();
 
 export function generateRandomString(length = 10) {
   const characters =
@@ -23,7 +20,7 @@ export function generateRandomString(length = 10) {
 
 const TodoList = () => {
   const rep = useReplicache("supriyo");
-  // @ts-expect-error
+  // @ts-expect-error complex ts error
   const todos = useSubscribe(rep, listTodos, [], [rep]);
 
   return (

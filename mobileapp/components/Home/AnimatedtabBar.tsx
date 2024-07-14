@@ -11,6 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Text } from "../ui/text";
 import useHomeTabIndex from "~/hooks/state/useHomeTabIndex";
+import { Star } from "~/lib/icons/Star";
 import clsx from "clsx";
 
 const calculateWithByCharCount = (str: string) => {
@@ -155,13 +156,23 @@ const Tab: React.FC<TabProps> = ({ item, onPress, index }) => {
           width: calculateWithByCharCount(item),
         }}
       >
-        <Text
-          className={clsx(
-            isSelectedTab ? "text-foreground" : " text-muted-foreground"
-          )}
-        >
-          {item}
-        </Text>
+        {item == "Fav" ? (
+          <Star
+            className={clsx(
+              isSelectedTab ? " text-amber-400" : "text-muted-foreground"
+            )}
+            size={20}
+            strokeWidth={2}
+          />
+        ) : (
+          <Text
+            className={clsx(
+              isSelectedTab ? "text-foreground" : " text-muted-foreground"
+            )}
+          >
+            {item}
+          </Text>
+        )}
       </View>
     </TouchableOpacity>
   );
