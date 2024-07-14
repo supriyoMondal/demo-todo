@@ -1,11 +1,9 @@
 import * as React from "react";
-import { Dimensions, TouchableOpacity, View, ScrollView } from "react-native";
+import { Dimensions, View, ScrollView } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from "react-native-reanimated";
-import { Text } from "~/components/ui/text";
-import clsx from "clsx";
 import { Separator } from "~/components/ui/saperator";
 import HomeFooter from "~/components/layout/HomeFooter";
 import AnimatedTabBar from "~/components/Home/AnimatedtabBar";
@@ -14,7 +12,6 @@ import useWorkSpaceList from "~/hooks/state/useWorkSpaceList";
 import { useSubscribe } from "replicache-react";
 import { useReplicache } from "~/hooks/useRiplecache";
 import { listTodos, TodoItem } from "shared-mutations";
-import useCurrentUserSpace from "~/hooks/state/useCurrentUserSpace";
 import TodoItemList from "~/components/Home/TodoItemList";
 
 const { width } = Dimensions.get("window");
@@ -26,8 +23,8 @@ export default function Screen() {
   const [currentUserSpaceId] = useStorage("userSpaceId");
 
   const { data: workspaces } = useWorkSpaceList(currentUserSpaceId);
-  const spaceId = useCurrentUserSpace((store) => store.spaceId);
-  const rep = useReplicache(spaceId);
+
+  const rep = useReplicache();
   // @ts-expect-error complex ts error
   const todos = useSubscribe(rep, listTodos, [], [rep]);
 
@@ -42,7 +39,7 @@ export default function Screen() {
 
     for (const todo of todos) {
       if (todo.favorite) {
-        map.Fab.push(todo);
+        map.Fav.push(todo);
       }
       if (!todo.workSpace) {
         map["My Todos"].push(todo);

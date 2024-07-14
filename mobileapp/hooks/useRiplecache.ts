@@ -4,11 +4,14 @@ import EventSource from "react-native-sse";
 import { Replicache } from "replicache";
 import { mutators } from "shared-mutations";
 import { BASE_URL, licenseKey } from "~/config/constants";
+import useCurrentUserSpace from "./state/useCurrentUserSpace";
 
-export function useReplicache(listID: string) {
+export function useReplicache() {
   if (!licenseKey) {
     throw new Error("Missing LICENSE_KEY");
   }
+
+  const listID = useCurrentUserSpace((store) => store.spaceId);
 
   const r = React.useMemo(
     () =>

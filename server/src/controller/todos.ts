@@ -170,6 +170,8 @@ export const pullTodoController = async (req: Request, res: Response) => {
       promises
     );
 
+    console.log("processed todos ", todos.length);
+
     if (!userSpaceVersion) {
       throw new Error("User space not found");
     }

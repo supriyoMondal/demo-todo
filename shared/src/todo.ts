@@ -1,10 +1,19 @@
 import type { ReadTransaction, ReadonlyJSONValue } from "replicache";
 
 export type TodoItem = {
-  id: string;
-  title: string;
-  description: string;
+  userSpaceId: string;
   sort: number;
+  id: string;
+  version: number;
+  lastModified: string;
+  description: string;
+  key: string;
+  title: string;
+  createdAt: string;
+  favorite: boolean | null;
+  completed: boolean | null;
+  deleted: boolean;
+  workSpace: string | null;
 };
 
 export type TodoUpdate = Partial<TodoItem> & Pick<TodoItem, "id">;

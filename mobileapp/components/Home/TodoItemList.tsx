@@ -22,6 +22,7 @@ import { ChevronDown } from "~/lib/icons/ChevronDown";
 import { ChevronUp } from "~/lib/icons/ChevronUp";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { Check } from "~/lib/icons/Check";
+import { useReplicache } from "~/hooks/useRiplecache";
 
 const { width } = Dimensions.get("window");
 
@@ -100,21 +101,40 @@ const CompletedTodos = ({ completedTodos }: { completedTodos: TodoItem[] }) => {
 };
 
 const TodoListItem = ({ todo }: { todo: TodoItem }) => {
+  const rep = useReplicache();
+
   return (
     <View key={todo.id} className="p-3 px-1 flex-row items-start  gap-3">
-      <TouchableOpacity className="p-2 rounded-full">
+      <TouchableOpacity
+        onPress={() => {
+          rep.mutate.updateTodo({
+            ...todo,
+            key: todo.id?.replace("todo/", ""),
+            id: todo.key?.replace("todo/", ""),
+            completed: true,
+          });
+        }}
+        className="p-2 rounded-full"
+      >
         <Circle className="text-foreground/70" />
       </TouchableOpacity>
       <View className=" flex-shrink flex-grow pt-1.5">
-        <Text className="text-lg">
-          {todo.title} hello hello hell hello hell
-        </Text>
+        <Text className="text-lg">{todo.title}</Text>
       </View>
-      <TouchableOpacity className="p-2 rounded-full">
+      <TouchableOpacity
+        onPress={() => {
+          rep.mutate.updateTodo({
+            ...todo,
+            key: todo.id?.replace("todo/", ""),
+            id: todo.key?.replace("todo/", ""),
+            favorite: !todo.favorite,
+          });
+        }}
+        className="p-2 rounded-full"
+      >
         <Star
           className={clsx(
-            "text-muted-foreground",
-            todo.favorite && "text-amber-400"
+            todo.favorite ? "!text-amber-400" : "text-muted-foreground"
           )}
           strokeWidth={2}
         />
