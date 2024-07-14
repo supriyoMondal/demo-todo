@@ -15,8 +15,10 @@ const MANAGE_TABS_HEIGHT = Platform.OS === "android" ? 360 : 400;
 
 const HomeFooter = ({
   createTodo,
+  scrollViewRef,
 }: {
   createTodo: (todo: { title: string; description: string }) => void;
+  scrollViewRef: React.RefObject<Animated.FlatList<{}>>;
 }) => {
   const sheetRef = React.useRef<React.ElementRef<typeof BottomSheet>>(null);
   const [keypadVisible, setKeypadVisible] = React.useState(false);
@@ -124,6 +126,7 @@ const HomeFooter = ({
             hideSheet={() => {
               sheetRef.current?.scrollTo(0);
             }}
+            scrollViewRef={scrollViewRef}
           />
         )}
       </BottomSheet>

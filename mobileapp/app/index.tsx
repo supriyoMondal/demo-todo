@@ -21,16 +21,14 @@ const { width } = Dimensions.get("window");
 export default function Screen() {
   const scrollViewRef = React.useRef<Animated.FlatList<{}>>(null);
   const tabScrollViewRef = React.useRef<ScrollView>(null);
-
   const currentUserSpaceId = useCurrentUserSpace((store) => store.spaceId);
-
   const { data: workspaces } = useWorkSpaceList(currentUserSpaceId);
   const tabIndex = useHomeTabIndex((store) => store.homeTabIndex);
 
   const rep = useReplicache();
 
   // @ts-expect-error complex ts error
-  const todos = useSubscribe(rep, listTodos, [], [rep, workspaces]);
+  const todos = useSubscribe(rep, listTodos, [], [rep]);
 
   const updateTodo = React.useCallback(
     (todo: TodoItem) => {
@@ -62,6 +60,8 @@ export default function Screen() {
   );
 
   const workSpaceTodos = React.useMemo(() => {
+    // const processedTodosSet: Record<string, boolean> = {};
+
     const map = workspaces.reduce(
       (acc, workspace) => {
         acc[workspace.name] = [];
@@ -71,6 +71,10 @@ export default function Screen() {
     );
 
     for (const todo of todos) {
+      // if (processedTodosSet[todo.id]) {
+      //   continue;
+      // }
+      // processedTodosSet[todo.id] = true;
       if (todo.favorite) {
         map.Fav.push(todo);
       }
@@ -133,9 +137,9 @@ export default function Screen() {
         onScroll={scrollHandler}
         extraData={workSpaceTodos}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
       />
-      <HomeFooter createTodo={createTodo} />
+      <HomeFooter createTodo={createTodo} scrollViewRef={scrollViewRef} />
     </View>
   );
 }

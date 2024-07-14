@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { generateRandomString } from "~/components/layout/TodoList";
 import { BASE_URL } from "~/config/constants";
 import { queryClient } from "~/config/queryClient";
 
@@ -27,8 +28,7 @@ const useAddUserWorkSpace = (spaceId: string) => {
             ...prevSpaces,
             {
               name: newSpace.name,
-              id: prevSpaces.length + 1,
-              userSpaceId: spaceId,
+              id: generateRandomString(4),
             },
           ]
         );

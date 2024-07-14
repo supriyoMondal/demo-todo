@@ -5,12 +5,12 @@ const useWorkSpaceList = (userSpaceId: string) => {
   return useQuery({
     queryKey: ["workSpaceList", userSpaceId],
     initialData: [
-      { name: "Fav", id: -1 },
-      { name: "My Todos", id: -2 },
+      { name: "Fav", id: "fab" },
+      { name: "My Todos", id: "my-todos" },
     ],
     queryFn: async () => {
       const res = await fetch(`${BASE_URL}/workSpace/list/${userSpaceId}`);
-      const workspaces: { name: string; id: number }[] = await res.json();
+      const workspaces: { name: string; id: string }[] = await res.json();
       return workspaces;
     },
   });

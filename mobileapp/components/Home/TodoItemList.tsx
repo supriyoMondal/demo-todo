@@ -62,6 +62,7 @@ const TodoItemList = ({
           </View>
         ) : null
       }
+      extraData={todos}
       ListFooterComponent={
         todos.length === 0 ? null : (
           <View>
@@ -148,4 +149,4 @@ const TodoListItem = ({
   );
 };
 
-export default TodoItemList;
+export default React.memo(TodoItemList);

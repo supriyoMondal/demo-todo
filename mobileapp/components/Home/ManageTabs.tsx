@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Dimensions, TouchableOpacity, View } from "react-native";
 import { Text } from "../ui/text";
 import { Separator } from "../ui/saperator";
 import useHomeTabIndex from "~/hooks/state/useHomeTabIndex";
@@ -9,8 +9,17 @@ import useWorkSpaceList from "~/hooks/state/useWorkSpaceList";
 import { Card } from "../ui/card";
 import { Plus } from "~/lib/icons/Plus";
 import { useNavigation } from "expo-router";
+import Animated from "react-native-reanimated";
 
-const ManageTabs = ({ hideSheet }: { hideSheet: () => void }) => {
+const { width } = Dimensions.get("window");
+
+const ManageTabs = ({
+  hideSheet,
+  scrollViewRef,
+}: {
+  hideSheet: () => void;
+  scrollViewRef: React.RefObject<Animated.FlatList<{}>>;
+}) => {
   const tabIndex = useHomeTabIndex((state) => state.homeTabIndex);
   const setHomeTabIndex = useHomeTabIndex((state) => state.setHomeTabIndex);
   const spaceId = useCurrentUserSpace((state) => state.spaceId);
@@ -42,7 +51,8 @@ const ManageTabs = ({ hideSheet }: { hideSheet: () => void }) => {
               key={workspace.name}
               onPress={() => {
                 hideSheet();
-                setHomeTabIndex(index);
+                // +1 because of Fav
+                scrollViewRef.current?.scrollToIndex({ index: index + 1 });
               }}
             >
               <Card

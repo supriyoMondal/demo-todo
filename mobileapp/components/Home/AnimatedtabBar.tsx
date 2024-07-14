@@ -24,7 +24,7 @@ const WIDTH_BUFFER = 10;
 const { width } = Dimensions.get("window");
 
 interface AnimatedTabBarProps {
-  items: { name: string; id: number }[];
+  items: { name: string; id: string }[];
   scrollX: Animated.SharedValue<number>;
   onTabPress: (index: number) => void;
   tabScrollViewRef: React.RefObject<ScrollView>;
@@ -47,14 +47,14 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
 
   const setHomeTabIndex = useHomeTabIndex((state) => state.setHomeTabIndex);
 
-  const inputRange = tabPositions.map((_, i) => i * width);
-
   const tabWidths = items.reduce((acc, item) => {
     acc.push(calculateWithByCharCount(item.name) - WIDTH_BUFFER * 2);
     return acc;
   }, [] as number[]);
 
   const activeTabStyle = useAnimatedStyle(() => {
+    const inputRange = tabPositions.map((_, i) => i * width);
+
     return {
       transform: [
         {
@@ -69,31 +69,34 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
         { duration: 300, easing: Easing.linear }
       ),
     };
-  }, []);
+  }, [tabPositions, tabWidths]);
 
-  const scrollTabBar = React.useCallback((index: number) => {
-    if (tabScrollViewRef.current) {
-      const maxScroll =
-        tabPositions[tabPositions.length - 1] +
-        tabWidths[tabWidths.length - 1] -
-        width +
-        WIDTH_BUFFER * 2;
+  const scrollTabBar = React.useCallback(
+    (index: number) => {
+      if (tabScrollViewRef.current) {
+        const maxScroll =
+          tabPositions[tabPositions.length - 1] +
+          tabWidths[tabWidths.length - 1] -
+          width +
+          WIDTH_BUFFER * 2;
 
-      const scrollTo = Math.max(
-        0,
-        Math.min(
-          tabPositions[index] - width / 2 + tabWidths[index] / 2,
-          maxScroll
-        )
-      );
+        const scrollTo = Math.max(
+          0,
+          Math.min(
+            tabPositions[index] - width / 2 + tabWidths[index] / 2,
+            maxScroll
+          )
+        );
 
-      setHomeTabIndex(index);
-      tabScrollViewRef.current.scrollTo({
-        x: scrollTo,
-        animated: true,
-      });
-    }
-  }, []);
+        setHomeTabIndex(index);
+        tabScrollViewRef.current.scrollTo({
+          x: scrollTo,
+          animated: true,
+        });
+      }
+    },
+    [tabWidths, tabPositions]
+  );
 
   useAnimatedReaction(
     () => Math.round(scrollX.value / width),
