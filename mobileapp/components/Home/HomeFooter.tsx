@@ -1,14 +1,17 @@
 import * as React from "react";
-import { Keyboard, TouchableOpacity, View } from "react-native";
+import { Keyboard, Platform, TouchableOpacity, View } from "react-native";
 import { Plus } from "~/lib/icons/Plus";
 import { TableProperties } from "~/lib/icons/List";
 import { HorizontalThreeDot } from "~/lib/icons/HorizontalThreeDot";
-import BottomSheet from "./BottomSheet";
-import { Text } from "../ui/text";
+import BottomSheet from "../layout/BottomSheet";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 import { useKeyboard } from "~/hooks/misc/keybaord";
+import clsx from "clsx";
+import CreateTodoWithRef from "./CreateTodoForm";
+import ManageTabs from "./ManageTabs";
+
+const ADD_TODO_FORM_HEIGHT = Platform.OS === "android" ? 180 : 220;
+const MANAGE_TABS_HEIGHT = Platform.OS === "android" ? 360 : 400;
 
 const HomeFooter = ({
   createTodo,
@@ -20,10 +23,12 @@ const HomeFooter = ({
   const createTodoRef =
     React.useRef<React.ElementRef<typeof CreateTodoWithRef>>(null);
 
-  const { keyboardHeight, dismissKeyboard } = useKeyboard();
+  const { keyboardHeight, dismissKeyboard } = useKeyboard(
+    Platform.OS === "ios" ? { eventType: "willShow" } : { eventType: "didShow" }
+  );
 
   const [bottomSheetType, setBottomSheetType] = React.useState<
-    "Add" | "Edit" | "List"
+    "Add" | "Edit" | "Tabs"
   >();
 
   React.useEffect(() => {
@@ -34,6 +39,7 @@ const HomeFooter = ({
       setBottomSheetType(undefined);
       setKeypadVisible(false);
     });
+
     return () => {
       Keyboard.removeAllListeners("keyboardDidShow");
       Keyboard.removeAllListeners("keyboardDidHide");
@@ -43,7 +49,7 @@ const HomeFooter = ({
   React.useEffect(() => {
     const isActive = sheetRef.current?.isActive();
     if (isActive) {
-      sheetRef.current?.scrollTo(-keyboardHeight - 200);
+      sheetRef.current?.scrollTo(-keyboardHeight - ADD_TODO_FORM_HEIGHT);
     }
   }, [keyboardHeight]);
 
@@ -51,11 +57,16 @@ const HomeFooter = ({
     <>
       {!bottomSheetType && !keypadVisible ? (
         <Animated.View entering={FadeInDown.delay(100)} exiting={FadeInDown}>
-          <View className="bg-card h-24 px-4 items-center flex-row gap-8">
+          <View
+            className={clsx(
+              "bg-card px-4 items-center flex-row gap-8",
+              Platform.OS === "android" ? "h-24" : "h-28"
+            )}
+          >
             <TouchableOpacity
               onPress={() => {
-                setBottomSheetType("List");
-                sheetRef.current?.scrollTo(-200);
+                setBottomSheetType("Tabs");
+                sheetRef.current?.scrollTo(-MANAGE_TABS_HEIGHT);
               }}
             >
               <TableProperties className="text-2xl text-center text-foreground" />
@@ -63,7 +74,7 @@ const HomeFooter = ({
             <TouchableOpacity
               onPress={() => {
                 setBottomSheetType("Edit");
-                sheetRef.current?.scrollTo(-200);
+                sheetRef.current?.scrollTo(-ADD_TODO_FORM_HEIGHT);
               }}
             >
               <HorizontalThreeDot className="text-2xl text-center text-foreground" />
@@ -74,7 +85,7 @@ const HomeFooter = ({
               className=" ml-auto bg-foreground/20 p-4 rounded-md"
               onPress={() => {
                 setBottomSheetType("Add");
-                sheetRef.current?.scrollTo(-200);
+                sheetRef.current?.scrollTo(-ADD_TODO_FORM_HEIGHT);
               }}
             >
               <Plus className="text-2xl text-center text-foreground" />
@@ -82,7 +93,12 @@ const HomeFooter = ({
           </View>
         </Animated.View>
       ) : (
-        <View className="h-24 bg-secondary/30" />
+        <View
+          className={clsx(
+            " bg-secondary/30",
+            Platform.OS === "android" ? "h-24" : "h-28"
+          )}
+        />
       )}
 
       <BottomSheet
@@ -92,74 +108,27 @@ const HomeFooter = ({
         }}
         ref={sheetRef}
       >
-        <CreateTodoWithRef
-          onCreateTodo={({ title, description }) => {
-            createTodo({ title, description });
-            setBottomSheetType(undefined);
-            dismissKeyboard();
-            sheetRef.current?.scrollTo(0);
-          }}
-          ref={createTodoRef}
-        />
+        {bottomSheetType === "Add" && (
+          <CreateTodoWithRef
+            onCreateTodo={({ title, description }) => {
+              createTodo({ title, description });
+              setBottomSheetType(undefined);
+              dismissKeyboard();
+              sheetRef.current?.scrollTo(0);
+            }}
+            ref={createTodoRef}
+          />
+        )}
+        {bottomSheetType === "Tabs" && (
+          <ManageTabs
+            hideSheet={() => {
+              sheetRef.current?.scrollTo(0);
+            }}
+          />
+        )}
       </BottomSheet>
     </>
   );
 };
-
-const CreateTodoView = (
-  {
-    onCreateTodo,
-  }: {
-    onCreateTodo: (todo: { title: string; description: string }) => void;
-  },
-  ref: React.ForwardedRef<{
-    focusInput: () => void;
-  }>
-) => {
-  const [inputText, setInputText] = React.useState("");
-
-  const inputRef = React.useRef<React.ElementRef<typeof Input>>(null);
-
-  const focusInput = React.useCallback(() => {
-    inputRef.current?.focus();
-  }, [inputRef]);
-
-  React.useImperativeHandle(ref, () => ({ focusInput }), []);
-
-  return (
-    <View className="flex-1  flex-row gap-4 p-4">
-      <Input
-        placeholder="Add new todo"
-        className=" flex-grow"
-        ref={inputRef}
-        onChangeText={(text) => {
-          setInputText(text);
-        }}
-        value={inputText}
-        onSubmitEditing={() => {
-          onCreateTodo({
-            title: inputText,
-            description: "",
-          });
-          setInputText("");
-        }}
-      />
-      <Button
-        disabled={!inputText}
-        onPress={() => {
-          onCreateTodo({
-            title: inputText,
-            description: "",
-          });
-          setInputText("");
-        }}
-      >
-        <Text>Save</Text>
-      </Button>
-    </View>
-  );
-};
-
-const CreateTodoWithRef = React.forwardRef(CreateTodoView);
 
 export default React.memo(HomeFooter);
