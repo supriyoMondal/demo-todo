@@ -16,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.supriyo07.starterbase"
     },
     "android": {
       "adaptiveIcon": {

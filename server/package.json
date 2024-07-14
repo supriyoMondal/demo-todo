@@ -9,8 +9,7 @@
     "build": "rimraf dist && npx tsc",
     "prestart": "npm run build",
     "db:generate": "drizzle-kit generate:pg",
-    "db:migrate": "npx tsx ./src/db/migrate.ts",
-    "db:make_migrations": "npm run db:generate && npm run db:migrate"
+    "db:migrate": "npx tsx ./src/db/migrate.ts"
   },
   "keywords": [],
   "author": "",

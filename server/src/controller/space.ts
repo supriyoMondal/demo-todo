@@ -38,7 +38,7 @@ export const deleteSpaceController = async (req: Request, res: Response) => {
 export const getSpaceListController = async (req: Request, res: Response) => {
   try {
     const spaces = await db.select().from(userSpace);
-    res.send(spaces);
+    res.send(spaces.map((space) => space.id));
   } catch (error) {
     handleError(error, res);
   }

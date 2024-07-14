@@ -55,5 +55,13 @@ export const todo = pgTable(
   })
 );
 
+export const todoWorkSpace = pgTable("todo_workspace", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  userSpaceId: varchar("user_space_id").references(() => userSpace.id, {
+    onDelete: "cascade",
+  }),
+});
+
 export type TodoItem = InferSelectModel<typeof todo>;
 export type TodoItemIn = InferInsertModel<typeof todo>;

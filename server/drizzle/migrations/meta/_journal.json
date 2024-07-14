@@ -85,6 +85,13 @@
       "when": 1720849173472,
       "tag": "0011_absent_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1720936878778,
+      "tag": "0012_pale_shatterstar",
+      "breakpoints": true
     }
   ]
 }
