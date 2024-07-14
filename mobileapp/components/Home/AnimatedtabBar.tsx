@@ -24,7 +24,7 @@ const WIDTH_BUFFER = 10;
 const { width } = Dimensions.get("window");
 
 interface AnimatedTabBarProps {
-  items: string[];
+  items: { name: string; id: number }[];
   scrollX: Animated.SharedValue<number>;
   onTabPress: (index: number) => void;
   tabScrollViewRef: React.RefObject<ScrollView>;
@@ -39,7 +39,9 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
   tabScrollViewRef,
 }) => {
   const tabPositions = items.reduce((acc, item, i) => {
-    acc.push(i === 0 ? 0 : calculateWithByCharCount(items[i - 1]) + acc[i - 1]);
+    acc.push(
+      i === 0 ? 0 : calculateWithByCharCount(items[i - 1].name) + acc[i - 1]
+    );
     return acc;
   }, [] as number[]);
 
@@ -48,7 +50,7 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
   const inputRange = tabPositions.map((_, i) => i * width);
 
   const tabWidths = items.reduce((acc, item) => {
-    acc.push(calculateWithByCharCount(item) - WIDTH_BUFFER * 2);
+    acc.push(calculateWithByCharCount(item.name) - WIDTH_BUFFER * 2);
     return acc;
   }, [] as number[]);
 
@@ -67,7 +69,7 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
         { duration: 300, easing: Easing.linear }
       ),
     };
-  });
+  }, []);
 
   const scrollTabBar = React.useCallback((index: number) => {
     if (tabScrollViewRef.current) {
@@ -112,7 +114,7 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
       {items.map((item, index) => (
         <Tab
           key={index}
-          item={item}
+          item={item.name}
           onPress={() => onTabPress(index)}
           index={index}
         />

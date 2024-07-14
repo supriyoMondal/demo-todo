@@ -7,7 +7,7 @@ interface CurrentUserSpaceState {
 }
 
 const useCurrentUserSpace = create<CurrentUserSpaceState>((set) => ({
-  spaceId: storage.getString(DEFAULTS_STORAGE_KEYS.userSpaceId) || "supriyo",
+  spaceId: storage.getString(DEFAULTS_STORAGE_KEYS.userSpaceId) || "default",
   setSpaceId: (id) => {
     storage.set(DEFAULTS_STORAGE_KEYS.userSpaceId, id);
     return set({ spaceId: id });

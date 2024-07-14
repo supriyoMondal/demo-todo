@@ -1,13 +1,7 @@
 import * as React from "react";
 import { TodoItem } from "shared-mutations";
 import { Text } from "../ui/text";
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, Image, TouchableOpacity, View } from "react-native";
 import { Circle } from "~/lib/icons/Circle";
 import { Star } from "~/lib/icons/Star";
 import clsx from "clsx";
@@ -22,7 +16,6 @@ import { ChevronDown } from "~/lib/icons/ChevronDown";
 import { ChevronUp } from "~/lib/icons/ChevronUp";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { Check } from "~/lib/icons/Check";
-import { useReplicache } from "~/hooks/useRiplecache";
 
 const { width } = Dimensions.get("window");
 
@@ -51,7 +44,7 @@ const TodoItemList = ({
   }, [todos]);
 
   return (
-    <FlatList
+    <Animated.FlatList
       data={notCompleted}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
@@ -59,13 +52,15 @@ const TodoItemList = ({
       )}
       style={{ flex: 1, width }}
       ListEmptyComponent={
-        <View className="flex-1 items-center justify-center h-[70vh]">
-          <Image
-            source={require("../../assets/placeholder/no-todo.webp")}
-            style={{ width: width * 0.5, height: width * 0.5 }}
-            resizeMode="contain"
-          />
-        </View>
+        todos.length === 0 ? (
+          <View className="flex-1 items-center justify-center h-[70vh]">
+            <Image
+              source={require("../../assets/placeholder/no-todo.webp")}
+              style={{ width: width * 0.5, height: width * 0.5 }}
+              resizeMode="contain"
+            />
+          </View>
+        ) : null
       }
       ListFooterComponent={
         todos.length === 0 ? null : (
@@ -116,38 +111,40 @@ const TodoListItem = ({
   onUpdateTodo: (todo: TodoItem) => void;
 }) => {
   return (
-    <View key={todo.id} className="p-3 px-1 flex-row items-start  gap-3">
-      <TouchableOpacity
-        onPress={() => {
-          onUpdateTodo({
-            ...todo,
-            completed: true,
-          });
-        }}
-        className="p-2 rounded-full"
-      >
-        <Circle className="text-foreground/70" />
-      </TouchableOpacity>
-      <View className=" flex-shrink flex-grow pt-1.5">
-        <Text className="text-lg">{todo.title}</Text>
+    <Animated.View entering={FadeInUp} exiting={FadeOutUp}>
+      <View className="p-3 px-1 flex-row items-start  gap-3">
+        <TouchableOpacity
+          onPress={() => {
+            onUpdateTodo({
+              ...todo,
+              completed: true,
+            });
+          }}
+          className="p-2 rounded-full"
+        >
+          <Circle className="text-foreground/70" />
+        </TouchableOpacity>
+        <View className=" flex-shrink flex-grow pt-1.5">
+          <Text className="text-lg">{todo.title}</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            onUpdateTodo({
+              ...todo,
+              favorite: !todo.favorite,
+            });
+          }}
+          className="p-2 rounded-full"
+        >
+          <Star
+            className={clsx(
+              todo.favorite ? "!text-amber-400" : "text-muted-foreground"
+            )}
+            strokeWidth={2}
+          />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() => {
-          onUpdateTodo({
-            ...todo,
-            favorite: !todo.favorite,
-          });
-        }}
-        className="p-2 rounded-full"
-      >
-        <Star
-          className={clsx(
-            todo.favorite ? "!text-amber-400" : "text-muted-foreground"
-          )}
-          strokeWidth={2}
-        />
-      </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 };
 

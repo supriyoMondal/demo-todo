@@ -23,7 +23,14 @@ const useAddUserWorkSpace = (spaceId: string) => {
       if (Array.isArray(prevSpaces)) {
         queryClient.setQueryData(
           ["workSpaceList", spaceId],
-          [...prevSpaces, newSpace]
+          [
+            ...prevSpaces,
+            {
+              name: newSpace.name,
+              id: prevSpaces.length + 1,
+              userSpaceId: spaceId,
+            },
+          ]
         );
       }
     },

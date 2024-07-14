@@ -5,9 +5,8 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { Separator } from "~/components/ui/saperator";
-import HomeFooter from "~/components/layout/HomeFooter";
+import HomeFooter from "~/components/Home/HomeFooter";
 import AnimatedTabBar from "~/components/Home/AnimatedtabBar";
-import { useStorage } from "~/hooks/useStorage";
 import useWorkSpaceList from "~/hooks/state/useWorkSpaceList";
 import { useSubscribe } from "replicache-react";
 import { useReplicache } from "~/hooks/useRiplecache";
@@ -31,7 +30,7 @@ export default function Screen() {
   const rep = useReplicache();
 
   // @ts-expect-error complex ts error
-  const todos = useSubscribe(rep, listTodos, [], [rep]);
+  const todos = useSubscribe(rep, listTodos, [], [rep, workspaces]);
 
   const updateTodo = React.useCallback(
     (todo: TodoItem) => {
@@ -46,10 +45,12 @@ export default function Screen() {
 
   const createTodo = React.useCallback(
     (todo: { title: string; description: string }) => {
+      const id = generateRandomString(8);
       const todoBody = {
         title: todo.title,
         description: todo.description,
-        id: generateRandomString(8),
+        id,
+        key: id,
         userSpaceId: currentUserSpaceId,
         workSpace: workspaces[tabIndex].name,
         favorite: tabIndex === 0,
@@ -110,9 +111,9 @@ export default function Screen() {
   );
 
   return (
-    <View className="flex-1 bg-secondary/30">
+    <View className="flex-1 bg-secondary/40">
       <AnimatedTabBar
-        items={workspaces.map((item) => item.name)}
+        items={workspaces}
         scrollX={scrollX}
         onTabPress={onTabPress}
         tabScrollViewRef={tabScrollViewRef}

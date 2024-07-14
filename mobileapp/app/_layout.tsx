@@ -87,6 +87,12 @@ export default function RootLayout() {
                 headerLeft: () => <ChangeWorkSpace />,
               }}
             />
+            <Stack.Screen
+              name="add-tab"
+              options={{
+                headerShown: false,
+              }}
+            />
           </Stack>
           <PortalHost />
         </ThemeProvider>

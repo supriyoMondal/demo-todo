@@ -5,6 +5,7 @@ import { Replicache } from "replicache";
 import { mutators } from "shared-mutations";
 import { BASE_URL, licenseKey } from "~/config/constants";
 import useCurrentUserSpace from "./state/useCurrentUserSpace";
+import { Platform } from "react-native";
 
 export function useReplicache() {
   if (!licenseKey) {
@@ -20,7 +21,9 @@ export function useReplicache() {
         pushURL: `${BASE_URL}/todo/push?spaceID=${listID}`,
         pullURL: `${BASE_URL}/todo/pull?spaceID=${listID}`,
         experimentalCreateKVStore:
-          createReplicacheExpoSQLiteExperimentalCreateKVStore,
+          Platform.OS !== "web"
+            ? createReplicacheExpoSQLiteExperimentalCreateKVStore
+            : undefined,
         name: listID,
         mutators,
       }),
@@ -44,6 +47,7 @@ export function useReplicache() {
     return () => {
       ev.removeAllEventListeners("message");
       ev.close();
+      r.close();
     };
   }, [listID]);
 
