@@ -29,6 +29,7 @@ const TodoItemList = ({
   const { completed, notCompleted } = useMemo(() => {
     const completed: TodoItem[] = [];
     const notCompleted: TodoItem[] = [];
+
     todos.forEach((todo) => {
       if (todo.completed) {
         completed.push(todo);

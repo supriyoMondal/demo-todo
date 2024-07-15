@@ -70,6 +70,8 @@ export default function Screen() {
       { "My Todos": [] } as Record<string, TodoItem[]>
     );
 
+    todos.sort((a, b) => b.sort - a.sort);
+
     for (const todo of todos) {
       // if (processedTodosSet[todo.id]) {
       //   continue;
@@ -80,7 +82,7 @@ export default function Screen() {
       }
       if (!todo.workSpace) {
         map["My Todos"].push(todo);
-      } else {
+      } else if (todo.workSpace !== "Fav") {
         map[todo.workSpace].push(todo);
       }
     }

@@ -49,6 +49,7 @@ export default function AddTabScreen() {
           setInputText(text);
         }}
         value={inputText}
+        placeholder="Enter name"
         onSubmitEditing={() => {
           addTabMutation.mutate({ name: inputText });
           navigation.goBack();
