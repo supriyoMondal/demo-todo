@@ -22,13 +22,14 @@ export default function Screen() {
   const scrollViewRef = React.useRef<Animated.FlatList<{}>>(null);
   const tabScrollViewRef = React.useRef<ScrollView>(null);
   const currentUserSpaceId = useCurrentUserSpace((store) => store.spaceId);
-  const { data: workspaces } = useWorkSpaceList(currentUserSpaceId);
+  const { data: workspaces } = useWorkSpaceList();
+
   const tabIndex = useHomeTabIndex((store) => store.homeTabIndex);
 
   const rep = useReplicache();
 
   // @ts-expect-error complex ts error
-  const todos = useSubscribe(rep, listTodos, [], [rep]);
+  const todos: TodoItem[] = useSubscribe(rep, listTodos, [], [rep]);
 
   const updateTodo = React.useCallback(
     (todo: TodoItem) => {
@@ -70,7 +71,7 @@ export default function Screen() {
     todos.sort((a, b) => b.sort - a.sort);
 
     for (const todo of todos) {
-      if (!map[todo.workSpace]) {
+      if (todo.workSpace && !map[todo.workSpace]) {
         map[todo.workSpace] = [];
       }
 
@@ -128,6 +129,7 @@ export default function Screen() {
       <Animated.FlatList
         data={workspaces}
         horizontal
+        key={workspaces.length}
         ref={scrollViewRef}
         style={{ flex: 1 }}
         showsHorizontalScrollIndicator={false}
@@ -139,8 +141,9 @@ export default function Screen() {
         onScroll={scrollHandler}
         extraData={workSpaceTodos}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => `${item.id}-hello`}
       />
+
       <HomeFooter createTodo={createTodo} scrollViewRef={scrollViewRef} />
     </View>
   );

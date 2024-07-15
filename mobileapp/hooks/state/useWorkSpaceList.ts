@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "~/config/constants";
+import useCurrentUserSpace from "./useCurrentUserSpace";
 
-const useWorkSpaceList = (userSpaceId: string) => {
+const useWorkSpaceList = () => {
+  const userSpaceId = useCurrentUserSpace((store) => store.spaceId);
+
   return useQuery({
     queryKey: ["workSpaceList", userSpaceId],
     initialData: [
@@ -11,6 +14,7 @@ const useWorkSpaceList = (userSpaceId: string) => {
     queryFn: async () => {
       const res = await fetch(`${BASE_URL}/workSpace/list/${userSpaceId}`);
       const workspaces: { name: string; id: string }[] = await res.json();
+
       return workspaces;
     },
   });

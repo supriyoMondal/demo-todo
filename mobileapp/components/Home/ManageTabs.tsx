@@ -1,10 +1,9 @@
 import * as React from "react";
-import { Dimensions, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Text } from "../ui/text";
 import { Separator } from "../ui/saperator";
 import useHomeTabIndex from "~/hooks/state/useHomeTabIndex";
 import { Star } from "~/lib/icons/Star";
-import useCurrentUserSpace from "~/hooks/state/useCurrentUserSpace";
 import useWorkSpaceList from "~/hooks/state/useWorkSpaceList";
 import { Card } from "../ui/card";
 import { Plus } from "~/lib/icons/Plus";
@@ -20,8 +19,7 @@ const ManageTabs = ({
 }) => {
   const tabIndex = useHomeTabIndex((state) => state.homeTabIndex);
 
-  const spaceId = useCurrentUserSpace((state) => state.spaceId);
-  const { data: workspaces } = useWorkSpaceList(spaceId);
+  const { data: workspaces } = useWorkSpaceList();
 
   const navigation = useNavigation();
 
@@ -72,6 +70,7 @@ const ManageTabs = ({
         activeOpacity={0.8}
         onPress={() => {
           hideSheet();
+          scrollViewRef.current?.scrollToIndex({ index: 0 });
           navigation.navigate("add-tab");
         }}
         className="flex-row gap-2 py-2 items-center"
