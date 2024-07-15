@@ -5,6 +5,8 @@ export type M = typeof mutators;
 
 export const mutators = {
   updateTodo: async (tx: WriteTransaction, update: TodoUpdate) => {
+    console.log("from update", update);
+
     const prev = await tx.get<TodoItem>(`todo/${update.id}`);
     const next = { ...prev, ...update };
     await tx.set(`todo/${next.id}`, next);
@@ -15,6 +17,8 @@ export const mutators = {
   },
 
   createTodo: async (tx: WriteTransaction, todo: Omit<TodoItem, "sort">) => {
+    console.log("from create", todo);
+
     const todos = await listTodos<TodoItem>(tx);
 
     const maxSort =

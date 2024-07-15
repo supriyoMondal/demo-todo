@@ -11,8 +11,6 @@ import { Plus } from "~/lib/icons/Plus";
 import { useNavigation } from "expo-router";
 import Animated from "react-native-reanimated";
 
-const { width } = Dimensions.get("window");
-
 const ManageTabs = ({
   hideSheet,
   scrollViewRef,
@@ -21,7 +19,7 @@ const ManageTabs = ({
   scrollViewRef: React.RefObject<Animated.FlatList<{}>>;
 }) => {
   const tabIndex = useHomeTabIndex((state) => state.homeTabIndex);
-  const setHomeTabIndex = useHomeTabIndex((state) => state.setHomeTabIndex);
+
   const spaceId = useCurrentUserSpace((state) => state.spaceId);
   const { data: workspaces } = useWorkSpaceList(spaceId);
 
@@ -33,6 +31,11 @@ const ManageTabs = ({
       <TouchableOpacity
         activeOpacity={0.8}
         className="flex-row gap-2 py-2 items-center"
+        onPress={() => {
+          hideSheet();
+
+          scrollViewRef.current?.scrollToIndex({ index: 0 });
+        }}
       >
         {tabIndex === 0 ? (
           <Star size={20} className="text-amber-400" strokeWidth={2} />

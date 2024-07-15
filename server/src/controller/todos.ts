@@ -116,6 +116,7 @@ export const pushTodoController = async (req: Request, res: Response) => {
       pokeBackend.poke(spaceID);
     });
     console.log(" all mutations processed");
+    return res.json({});
   } catch (error) {
     handleError(error, res);
   }

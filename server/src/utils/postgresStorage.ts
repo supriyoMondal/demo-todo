@@ -36,12 +36,18 @@ export class PostgresStorage {
       completed: z.boolean().optional().default(false),
       deleted: z.boolean().optional().default(false),
       sort: z.number().optional().default(0),
+      workSpace: z.union([z.string(), z.null()]).optional().default(null),
     });
 
-    console.log({ putKey: key, putValue: value });
-
-    const { title, description, favorite, completed, deleted, sort } =
-      todoSchema.parse(value);
+    const {
+      title,
+      description,
+      favorite,
+      completed,
+      deleted,
+      sort,
+      workSpace,
+    } = todoSchema.parse(value);
 
     const isTodoAlreadyPresent = await this.hasEntry(key);
 
@@ -58,6 +64,7 @@ export class PostgresStorage {
           //  @ts-ignore
           lastModified: new Date(),
           version: this._version,
+          workSpace,
         })
         .where(eq(todo.key, key));
 
@@ -79,6 +86,7 @@ export class PostgresStorage {
       userSpaceId: this._spaceID,
       version: this._version,
       sort,
+      workSpace,
     };
 
     await this._pgClient.insert(todo).values(todoEntry);
@@ -122,6 +130,8 @@ async function* entriesFromPGClient(
   spaceID: string,
   fromKey: string
 ): AsyncIterable<readonly [string, ReadonlyJSONValue]> {
+  console.log("hello");
+
   const todoItems = await pgClient
     .select()
     .from(todo)

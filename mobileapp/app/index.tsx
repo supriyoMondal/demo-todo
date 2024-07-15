@@ -62,21 +62,18 @@ export default function Screen() {
   const workSpaceTodos = React.useMemo(() => {
     // const processedTodosSet: Record<string, boolean> = {};
 
-    const map = workspaces.reduce(
-      (acc, workspace) => {
-        acc[workspace.name] = [];
-        return acc;
-      },
-      { "My Todos": [] } as Record<string, TodoItem[]>
-    );
+    const map: Record<string, TodoItem[]> = {
+      "My Todos": [],
+      Fav: [],
+    };
 
     todos.sort((a, b) => b.sort - a.sort);
 
     for (const todo of todos) {
-      // if (processedTodosSet[todo.id]) {
-      //   continue;
-      // }
-      // processedTodosSet[todo.id] = true;
+      if (!map[todo.workSpace]) {
+        map[todo.workSpace] = [];
+      }
+
       if (todo.favorite) {
         map.Fav.push(todo);
       }
@@ -111,7 +108,10 @@ export default function Screen() {
         id: number;
       };
     }) => (
-      <TodoItemList todos={workSpaceTodos[item.name]} updateTodo={updateTodo} />
+      <TodoItemList
+        todos={workSpaceTodos[item.name] || []}
+        updateTodo={updateTodo}
+      />
     ),
     [workSpaceTodos]
   );
